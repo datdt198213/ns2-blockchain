@@ -8,8 +8,9 @@ set val(ant)            Antenna/OmniAntenna        ;# antenna model
 set val(ifqlen)         50                         ;# max packet in ifq
 set val(nn)             48                         ;# number of mobilenodes
 set val(rp)             AODV                       ;# routing protocol
-set opt(x) 1904
-set opt(y) 2355
+set opt(x) 1904;
+set opt(y) 2355;
+set val(stop) 100;
 
 
 #
@@ -66,26 +67,39 @@ create-god $val(nn)
 
 source mobility.tcl
 
-# Setup traffic flow between nodes
-# TCP connections between node_(0) and node_(1)
 
-set tcp [new Agent/TCP]
-$tcp set class_ 2
-set sink [new Agent/TCPSink]
-$ns_ attach-agent $node_(0) $tcp
-$ns_ attach-agent $node_(1) $sink
-$ns_ connect $tcp $sink
-set ftp [new Application/FTP]
-$ftp attach-agent $tcp
-$ns_ at 10.0 "$ftp start" 
+# Setup traffic flow between nodes
+source cbr48m.tcl
+
+# UDP connection between node_(0) and node_(1)
+# set udp0 [new Agent/UDP]
+# $ns_ attach-agent $node_(0) $udp0
+
+# set udp1 [new Agent/UDP]
+# $ns_ attach-agent $node_(1) $udp1
+
+# set null0 [new Agent/Null]
+# $ns_ attach-agent $node_(1) $null0
+
+# set null1 [new Agent/Null]
+# $ns_ attach-agent $node_(0) $null1
+
+# $ns_ connect $udp0 $null0
+# $ns_ connect $udp1 $null1
+# $udp0 set fid_ 1
+
+# set cbr [new Application/Traffic/CBR]
+# $cbr attach-agent $udp0
+# $cbr set type_ CBR
+# $cbr set packet_size_ 512
 
 #
 # Tell nodes when the simulation ends
 #
 for {set i 0} {$i < $val(nn) } {incr i} {
-    $ns_ at 100.0 "$node_($i) reset";
+    $ns_ at $val(stop) "$node_($i) reset";
 }
-$ns_ at 100.0 "stop"
+$ns_ at $val(stop) "stop"
 $ns_ at 100.01 "puts \"NS EXITING...\" ; $ns_ halt"
 proc stop {} {
     global ns_ tracefd

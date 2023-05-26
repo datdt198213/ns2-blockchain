@@ -1,5 +1,5 @@
-# vanet-simulatioin
-**1. Installation ns2 **
+# vanet-simulation
+**1. NS2 installation **
 
 Step 1: Install ns2 from web browser and decompress
 ```
@@ -20,9 +20,22 @@ Edit file /etc/apt/sources.list
 
 ```
 $ sudo nano /etc/apt/sources.list
-Add this content **deb http://in.archive.ubuntu.com/ubuntu/ bionic main universe**
-$ sudo apt update
 ```
+
+Add below content to file /etc/apt/source.list
+```
+deb http://in.archive.ubuntu.com/ubuntu/ bionic main universe
+```
+
+Update system and download gcc
+```
+$ sudo apt update
+$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+$ sudo apt update
+$ sudo apt install gcc-4.8 g++-4.8
+```
+
+Step 4: 
 
 
 

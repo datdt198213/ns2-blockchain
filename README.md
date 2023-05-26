@@ -1,5 +1,6 @@
 # vanet-simulation
-**1. NS2 installation **
+
+**1. NS2 installation**
 
 Step 1: Install ns2 from web browser and decompress
 ```

@@ -1,4 +1,5 @@
 # vanet-simulation
+Operating system: Ubuntu 20.04.6 LTS
 
 **1. NS2 installation**
 
@@ -67,6 +68,7 @@ Add PATH and LD_LIBRARY_PATH into .bashrc file
 export PATH=$PATH:/home/dangdat/ns-allinone-2.35/bin:/home/dangdat/ns-allinone-2.35/tcl8.5.10/unix:/home/dangdat/ns-allinone-2.35/tk8.5.10/unix
 export LD_LIBRARY_PATH=/home/dangdat/ns-allinone-2.35/otcl-1.14:/home/dangdat/ns-allinone-2.35/lib
 
+Note: In my case, the location of ns-allione-2.35 folder is /home/dangdat/
 ```
 
 Run .bashrc file to update

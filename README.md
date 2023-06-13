@@ -78,3 +78,20 @@ $ source .bashrc
 
 **2. Installation SUMO**
 
+
+**3. Files functionality**
+
+activity.tcl: state of vehicles when it stop or start
+
+init.tcl: position of vehicles in each time
+
+simulation-data-net.net.xml: road and type of road from ".osm" file
+
+simulation-data-road-side.poly.xml: fixture in road side
+
+simulation-data-route.rou.xml: data of route export from simulation-data-net.net.xml to run simulation of sumo
+
+simulation-data-vehicle.sumo.xml: data of vehicle after simulation of sumo have done
+
+simulation.sumo.cfg: run simulation by sumo
+

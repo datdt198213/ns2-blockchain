@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import csv
 
-file = open('../lethanhnghi/init.tcl', 'r')
+file = open('../simulation/init.tcl', 'r')
 
 # Read the contents of the file
 lines = file.readlines()

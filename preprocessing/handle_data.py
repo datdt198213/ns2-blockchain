@@ -1,20 +1,20 @@
 import json
+import csv
 
 net_file = './data/net.json'
 vehicle_file = './data/vehicle.json'
 
 
 class lane:
-    def __init__(self, _id, _index, _type, _speed, _length, _shape):
+    def __init__(self, _id, _type, _speed, _length, _shape):
         self.id = _id
-        self.index = _index
         self.type = _type
         self.speed = _speed
         self.length = _length
         self.shape = _shape
 
     def display(self):
-        print(f"ID: {self.id}, Index: {self.index}, Type: {self.type}, Speed: {self.speed}, Length: {self.length}, Shape: {self.shape}")
+        print(f"ID: {self.id}, Type: {self.type}, Speed: {self.speed}, Length: {self.length}, Shape: {self.shape}")
 
 lanes = []
 
@@ -30,30 +30,38 @@ with open(net_file) as json_file:
             type_of_lane = i['type']
             if(type(i['lane']) == list):
                 for j in i['lane']:
-                    lanes.append(lane(j['id'], j['index'], type_of_lane, j['speed'], j['length'], j['shape']))
+                    lanes.append(lane(j['id'], type_of_lane, j['speed'], j['length'], j['shape']))
             elif(type(i['lane']) == dict):
-                lanes.append(lane(i['id'], i['index'], type_of_lane, i['speed'], i['length'], i['shape']))
+                j = i['lane']                    
+                lanes.append(lane(j['id'], type_of_lane, j['speed'], j['length'], j['shape']))
 
         except KeyError:
+            if(type(i['lane']) == list):
+                for j in i['lane']:
+                    lanes.append(lane(j['id'], 'highway.normal', j['speed'], j['length'], j['shape']))
+            elif(type(i['lane']) == dict):
+                j = i['lane']                    
+                lanes.append(lane(j['id'], 'highway.normal', j['speed'], j['length'], j['shape']))
             print("Not have key type")
         
     # for l in lanes:
-    #     l.display()
+    #     print(l.id)
 
 class vehicle:
-    def __init__(self, _time, _node, _x, _y, _angle, _speed, _pos, _lane, _slope):
+    def __init__(self, _time, _id, _x, _y, _angle, _speed, _pos, _lane, _duration, _condition):
         self.time = _time
-        self.node = _node
+        self.id = _id
         self.x = _x
         self.y = _y
         self.angle = _angle
         self.speed = _speed
         self.pos = _pos
         self.lane = _lane
-        self.slope = _slope
+        self.duration = _duration
+        self.condition = _condition
 
     def display(self):
-        print(f"Time: {self.time}, Node: {self.node}, X: {self.x}, Y: {self.y}, Angle: {self.angle}, Speed: {self.speed}, Position: {self.pos}, Lane: {self.lane}, Slope: {self.slope}")
+        print(f"Time: {self.time}, id: {self.id}, X: {self.x}, Y: {self.y}, Angle: {self.angle}, Speed: {self.speed}, Position: {self.pos}, Lane: {self.lane}, Duration: {self.duration}, Condition: {self.condition}")
 
 vehicles = []
 
@@ -67,29 +75,100 @@ with open(vehicle_file) as json_file:
             for j in i['vehicle']:
                 vehicles.append(vehicle(i['time'], j['id'], j['x'], j['y'], 
                        j['angle'], j['speed'], j['pos'], 
-                       j['lane'], j['slope']))
+                       j['lane'], 0.0, "None"))
         elif (type(i['vehicle']) == dict):
             vehicles.append(vehicle(i['time'], i['vehicle']['id'], i['vehicle']['x'], i['vehicle']['y'], 
                        i['vehicle']['angle'], i['vehicle']['speed'], i['vehicle']['pos'], 
-                       i['vehicle']['lane'], i['vehicle']['slope']))
+                       i['vehicle']['lane'], 0.0, "None"))
 
-    # for v in vehicles:
-    #     for i in vehicles:
-    #         if ( v.id == i.id and v.pos == i.pos and v.id == '1')
-        
+    new_vehicles = []
+
+    # Classify data
+    check = []
+    for i in range(0, len(vehicles)):
+        check.append(False)
+
+    for i in range(0, len(vehicles)):
+        temps = []
+        if (check[i] == False):
+            temps.append(vehicles[i])
+            check[i] = True
+
+            for j in range(i+1, len(vehicles)):
+                if(vehicles[i].id == vehicles[j].id and check[j] == False):
+                    temps.append(vehicles[j])
+                    check[j] = True
+
+            new_vehicles.append(temps)
+
+    # for v in new_vehicles:
+    #     checked = set()
+    #     for i in range(0, len(v)):
+    #         for j in range(i + 1, len(v)):
+    #             timestep = round (float(v[j].time) - float(v[i].time), 2)
+    #             if timestep == 0.1 and v[i].id == v[j].id and v[i].pos == v[j].pos and v[i].id not in checked:
+    #                 v[j].duration = round(float (v[j].time) - float(v[i].time), 2)
+    #                 checked.add(v[i])
+
+    for v in new_vehicles:
+        checked = set()
+        for i, vi in enumerate(v):
+            if vi.id not in checked:
+                duration = 0
+                for j, vj in enumerate(v[i+1:], start=i+1):
+                    if vi.id == vj.id and vi.pos == vj.pos:
+                        duration += 0.1
+                        vj.duration = duration
+                        checked.add(vi.id)
+
+
+    # for v in new_vehicles:
+    #     for e in v:
+    #         if e.duration != 0:
+    #             e.display()
+    
+
 
 class export: 
-    def __init__(self, _timestamp, _location, _veloccity, _duration, _road_type, _road_condition, _road_event):
+    def __init__(self, _id, _timestamp, _location, _velocity, _duration, _road_type, _road_condition, _road_event):
+        self.id = _id
         self.timestamp = _timestamp
         self.location = _location
-        self.velocity = _veloccity
+        self.velocity = _velocity
         self.duration = _duration
         self.road_type = _road_type
         self.road_condition = _road_condition
         self.road_event = _road_event
 
     def display(self):
-        print(f"Timestamp: {self.timestamp}, location: {self.location}, velocity: {self.velocity}, duration: {self.duration}, road type: {self.road_type}, road condition: {self.road_condition}. road event: {self.road_event}")
+        print(f"ID: {self.id} Timestamp: {self.timestamp}, location: {self.location}, velocity: {self.velocity}, duration: {self.duration}, road type: {self.road_type}, road condition: {self.road_condition}. road event: {self.road_event}")
+
+    def get_row(self):
+        return [self.id, self.timestamp, self.location, self.velocity, self.duration, self.road_type, self.road_condition, self.road_event]
 
 exports = []
 
+def export_data():
+    for v in vehicles:
+        for l in lanes:
+            if v.lane == l.id:
+                v.lane = l.type
+                v.condition = l.speed
+                
+
+    for v in vehicles:
+        exports.append(export(v.id, v.time, v.pos, v.speed, v.duration, v.lane, v.condition, "None"))
+
+    f = open('./data.csv', 'w')
+
+    writer = csv.writer(f)
+
+    writer.writerow(["Node", "Timestamp", "Location", "Velocity", "Duration", "Road Type", "Road Condition", "Road Event"])
+
+    for ve in exports:
+        writer.writerow(ve.get_row())
+    
+    # for e in exports:
+    #     e.display()
+
+export_data()

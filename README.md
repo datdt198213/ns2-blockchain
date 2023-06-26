@@ -95,3 +95,5 @@ simulation-data-vehicle.sumo.xml: data of vehicle after simulation of sumo have 
 
 simulation.sumo.cfg: run simulation by sumo
 
+**4. Export data traffic**
+Run file data_handle.py in folder preprocessing
